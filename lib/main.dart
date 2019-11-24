@@ -5,6 +5,7 @@ void main() {
     runApp(
         new MaterialApp(
           title: 'WheatherReport',
+          debugShowCheckedModeBanner: false,
           home: new WeatherReport(),
         )
     );
