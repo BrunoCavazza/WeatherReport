@@ -13,9 +13,16 @@ class WeatherReport extends StatefulWidget {
 
 class _WeatherReportState extends State<WeatherReport> {
 
+  String temperatura = null;
+
   void showStuff() async {
     Map data =  await getWeather(util.appId, util.defaultCity);
         print(data.toString());
+  }
+
+  void initState(){
+    super.initState();
+    this.showStuff();
   }
 
   @override
@@ -46,19 +53,12 @@ class _WeatherReportState extends State<WeatherReport> {
             child: new Text('Cordoba',
             style: cityStyle(),),
           ),
-          new Container(
-            alignment: Alignment.center,
-            child: new Image.asset('images/7.gif',
-              height: 1200,
-              width: 500,
-              fit: BoxFit.fill,
-            ),
-          ),
 
           //Fetch del Clima
           new Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 400),
-            alignment: Alignment.center, child: new Text('32*', style: tempStyle())
+            alignment: Alignment.center,
+              child: new Text('$temperatura°', style: tempStyle()),
           ),
         ],
       ),
@@ -68,10 +68,19 @@ class _WeatherReportState extends State<WeatherReport> {
   Future<Map> getWeather(String appId, String city)  async {
     String apiUrl = 'http://api.openweathermap.org/data/2.5/forecast?id=$city&APPID=' '${util.appId}&units=metric';
 
-    http.Response response = await http.get(apiUrl);
+    http.Response response = await http.get(
+        Uri.encodeFull(apiUrl),
+        headers: {"Accept": "application/json"}
+    );
 
-    return json.decode(response.body);
+    setState(() {
+      var decodeJson = jsonDecode(response.body);
+      temperatura = decodeJson['list'][0]['main']['temp'].toString();
+    });
+
+    return jsonDecode(response.body);
   }
+
 
 }
 
