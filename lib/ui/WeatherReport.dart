@@ -14,6 +14,9 @@ class WeatherReport extends StatefulWidget {
 class _WeatherReportState extends State<WeatherReport> {
 
   String temperatura = null;
+  String maxima = null;
+  String minima = null;
+  String humedad = null;
 
   void showStuff() async {
     Map data =  await getWeather(util.appId, util.defaultCity);
@@ -34,7 +37,7 @@ class _WeatherReportState extends State<WeatherReport> {
         backgroundColor: Colors.deepPurpleAccent,
         actions: <Widget>[
           new IconButton(
-              icon: new Icon(Icons.menu,),
+              icon: new Icon(Icons.refresh,),
               onPressed: showStuff)
         ],
       ),
@@ -54,11 +57,47 @@ class _WeatherReportState extends State<WeatherReport> {
             style: cityStyle(),),
           ),
 
-          //Fetch del Clima
+          //Fetchs del Clima
           new Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 400),
             alignment: Alignment.center,
               child: new Text('$temperatura°', style: tempStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 500),
+            alignment: Alignment.center,
+            child: new Text('Temperatura', style: bottomStyle()),
+          ),
+
+          new Container(
+            margin: const EdgeInsets.fromLTRB(0, 550, 240, 0),
+            alignment: Alignment.center,
+            child: new Text('$maxima°', style: bottomStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(240, 550, 0, 0),
+            alignment: Alignment.center,
+            child: new Text('$temperatura°', style: bottomStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(0, 550, 0, 0),
+            alignment: Alignment.center,
+            child: new Text('$humedad%', style: bottomStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(0, 480, 0, 0),
+            alignment: Alignment.center,
+            child: new Text('Hum', style: bottomStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(0, 480, 240, 0),
+            alignment: Alignment.center,
+            child: new Text('Max', style: bottomStyle()),
+          ),
+          new Container(
+            margin: const EdgeInsets.fromLTRB(240, 480, 0, 0),
+            alignment: Alignment.center,
+            child: new Text('Min', style: bottomStyle()),
           ),
         ],
       ),
@@ -66,7 +105,7 @@ class _WeatherReportState extends State<WeatherReport> {
   }
 
   Future<Map> getWeather(String appId, String city)  async {
-    String apiUrl = 'http://api.openweathermap.org/data/2.5/forecast?id=$city&APPID=' '${util.appId}&units=metric';
+    String apiUrl = 'http://api.openweathermap.org/data/2.5/weather?id=$city&APPID=' '${util.appId}&units=metric';
 
     http.Response response = await http.get(
         Uri.encodeFull(apiUrl),
@@ -75,7 +114,10 @@ class _WeatherReportState extends State<WeatherReport> {
 
     setState(() {
       var decodeJson = jsonDecode(response.body);
-      temperatura = decodeJson['list'][0]['main']['temp'].toString();
+      temperatura = decodeJson['object']['main']['temp'].toString();
+      maxima = decodeJson['object']['main']['temp_max'].toString();
+      minima = decodeJson['object']['main']['temp_min'].toString();
+      humedad = decodeJson['object']['main']['humidity'].toString();
     });
 
     return jsonDecode(response.body);
@@ -89,7 +131,7 @@ class _WeatherReportState extends State<WeatherReport> {
 
 TextStyle cityStyle() {
     return new TextStyle(
-        color: Colors.deepPurpleAccent,
+        color: Colors.black,
         fontSize: 23,
         fontStyle: FontStyle.italic
     );
@@ -101,4 +143,12 @@ TextStyle tempStyle() {
       fontWeight: FontWeight.w500,
       fontSize: 49.9
     );
+}
+TextStyle bottomStyle() {
+  return new TextStyle(
+      color: Colors.black,
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w500,
+      fontSize: 35
+  );
 }
